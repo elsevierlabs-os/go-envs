@@ -1,3 +1,3 @@
-module github.com/zvdm/go-envs
+module github.com/elsevierlabs-os/go-envs
 
 go 1.18
