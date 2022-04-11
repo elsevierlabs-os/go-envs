@@ -28,6 +28,10 @@ envStr := envVars.Get("ENV_STRING")
 envSliceInt := envVars.GetSliceInt("ENV_SLICE_OF_INT")
 envBool := envVars.GetBool("ENV_BOOL")
 ```
+Also, the default value for an environment variable can be set. This value will be used if the environment variable doesn't exist:
+```go
+envStr := envVars.Get("ENV_STRING", "someDefaultValue")
+```
 
 ### Some requirements
 To read some kind of variables correctly, it should be written (in the `.env` file or environments) according to the following rules:
