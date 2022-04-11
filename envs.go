@@ -12,13 +12,21 @@ import (
 type EnvConfig map[string]string
 
 // Get returns an environment variable value as a string
-func (c EnvConfig) Get(key string) string {
-	return c[key]
+func (c EnvConfig) Get(key string, defaultValue ...string) string {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	return value
 }
 
 // GetBool returns an environment variable value as a boolean field
-func (c EnvConfig) GetBool(key string) bool {
-	res, err := strconv.ParseBool(c[key])
+func (c EnvConfig) GetBool(key string, defaultValue ...bool) bool {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	res, err := strconv.ParseBool(value)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to parse key %s to boolean - ", key), err)
 	}
@@ -26,8 +34,12 @@ func (c EnvConfig) GetBool(key string) bool {
 }
 
 // GetFloat returns an environment variable value as a float
-func (c EnvConfig) GetFloat(key string) float32 {
-	res, err := strconv.ParseFloat(c[key], 32)
+func (c EnvConfig) GetFloat(key string, defaultValue ...float32) float32 {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	res, err := strconv.ParseFloat(value, 32)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to parse key %s to float - ", key), err)
 	}
@@ -35,8 +47,12 @@ func (c EnvConfig) GetFloat(key string) float32 {
 }
 
 // GetInt returns an environment variable value as an integer
-func (c EnvConfig) GetInt(key string) int {
-	res, err := strconv.Atoi(c[key])
+func (c EnvConfig) GetInt(key string, defaultValue ...int) int {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	res, err := strconv.Atoi(value)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to parse key %s to integer - ", key), err)
 	}
@@ -44,8 +60,12 @@ func (c EnvConfig) GetInt(key string) int {
 }
 
 // GetMap returns an environment variable value as a map of strings
-func (c EnvConfig) GetMap(key string) map[string]string {
-	pairs := strings.Split(c[key], ";")
+func (c EnvConfig) GetMap(key string, defaultValue ...map[string]string) map[string]string {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	pairs := strings.Split(value, ";")
 	result := make(map[string]string, len(pairs))
 	for _, pair := range pairs {
 		keyVal := strings.Split(pair, ":")
@@ -55,13 +75,21 @@ func (c EnvConfig) GetMap(key string) map[string]string {
 }
 
 // GetSlice returns an environment variable value as a slice of strings
-func (c EnvConfig) GetSlice(key string) []string {
-	return strings.Split(c[key], ",")
+func (c EnvConfig) GetSlice(key string, defaultValue ...[]string) []string {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	return strings.Split(value, ",")
 }
 
 // GetSliceFloat returns an environment variable value as a slice of floats
-func (c EnvConfig) GetSliceFloat(key string) []float32 {
-	nums := strings.Split(c[key], ",")
+func (c EnvConfig) GetSliceFloat(key string, defaultValue ...[]float32) []float32 {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	nums := strings.Split(value, ",")
 	result := make([]float32, len(nums))
 	for i, num := range nums {
 		flo64, err := strconv.ParseFloat(num, 32)
@@ -74,8 +102,12 @@ func (c EnvConfig) GetSliceFloat(key string) []float32 {
 }
 
 // GetSliceInt returns an environment variable value as a slice of integers
-func (c EnvConfig) GetSliceInt(key string) []int {
-	nums := strings.Split(c[key], ",")
+func (c EnvConfig) GetSliceInt(key string, defaultValue ...[]int) []int {
+	value, ok := c[key]
+	if !ok && len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	nums := strings.Split(value, ",")
 	var (
 		err    error
 		result = make([]int, len(nums))
