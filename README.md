@@ -7,6 +7,13 @@ To read environment variables initialize a local variable using `EnvConfig`, tha
 envVars := EnvConfig{}
 envVars.ReadEnvs()
 ```
+By default, the method `ReadEnvs` is looking for the file `.env` in the root of the project. This behavior can be changed just set the struct `EnvConfig` field `Filepath`.
+```go
+envVars := EnvConfig{Filepath: "customFilepath"}
+envVars.ReadEnvs()
+```
+In `EnvConfig` also can be set the field `IsDebug`, which allows log some extra information.
+
 <ins>**NOTE**</ins>: All errors while parsing environment variables will call the program termination, that's why the variables should be read and used at launch of the application.
 
 ### How it works

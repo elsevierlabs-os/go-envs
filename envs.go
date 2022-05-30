@@ -9,11 +9,16 @@ import (
 	"strings"
 )
 
-type EnvConfig map[string]string
+type EnvConfig struct {
+	Filepath string
+	IsDebug  bool
+
+	envs map[string]string
+}
 
 // Get returns an environment variable value as a string
-func (c EnvConfig) Get(key string, defaultValue ...string) string {
-	value, ok := c[key]
+func (c *EnvConfig) Get(key string, defaultValue ...string) string {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -21,8 +26,8 @@ func (c EnvConfig) Get(key string, defaultValue ...string) string {
 }
 
 // GetBool returns an environment variable value as a boolean field
-func (c EnvConfig) GetBool(key string, defaultValue ...bool) bool {
-	value, ok := c[key]
+func (c *EnvConfig) GetBool(key string, defaultValue ...bool) bool {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -34,8 +39,8 @@ func (c EnvConfig) GetBool(key string, defaultValue ...bool) bool {
 }
 
 // GetFloat returns an environment variable value as a float
-func (c EnvConfig) GetFloat(key string, defaultValue ...float32) float32 {
-	value, ok := c[key]
+func (c *EnvConfig) GetFloat(key string, defaultValue ...float32) float32 {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -47,8 +52,8 @@ func (c EnvConfig) GetFloat(key string, defaultValue ...float32) float32 {
 }
 
 // GetInt returns an environment variable value as an integer
-func (c EnvConfig) GetInt(key string, defaultValue ...int) int {
-	value, ok := c[key]
+func (c *EnvConfig) GetInt(key string, defaultValue ...int) int {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -60,8 +65,8 @@ func (c EnvConfig) GetInt(key string, defaultValue ...int) int {
 }
 
 // GetMap returns an environment variable value as a map of strings
-func (c EnvConfig) GetMap(key string, defaultValue ...map[string]string) map[string]string {
-	value, ok := c[key]
+func (c *EnvConfig) GetMap(key string, defaultValue ...map[string]string) map[string]string {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -75,8 +80,8 @@ func (c EnvConfig) GetMap(key string, defaultValue ...map[string]string) map[str
 }
 
 // GetSlice returns an environment variable value as a slice of strings
-func (c EnvConfig) GetSlice(key string, defaultValue ...[]string) []string {
-	value, ok := c[key]
+func (c *EnvConfig) GetSlice(key string, defaultValue ...[]string) []string {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -84,8 +89,8 @@ func (c EnvConfig) GetSlice(key string, defaultValue ...[]string) []string {
 }
 
 // GetSliceFloat returns an environment variable value as a slice of floats
-func (c EnvConfig) GetSliceFloat(key string, defaultValue ...[]float32) []float32 {
-	value, ok := c[key]
+func (c *EnvConfig) GetSliceFloat(key string, defaultValue ...[]float32) []float32 {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -102,8 +107,8 @@ func (c EnvConfig) GetSliceFloat(key string, defaultValue ...[]float32) []float3
 }
 
 // GetSliceInt returns an environment variable value as a slice of integers
-func (c EnvConfig) GetSliceInt(key string, defaultValue ...[]int) []int {
-	value, ok := c[key]
+func (c *EnvConfig) GetSliceInt(key string, defaultValue ...[]int) []int {
+	value, ok := c.envs[key]
 	if !ok && len(defaultValue) > 0 {
 		return defaultValue[0]
 	}
@@ -121,14 +126,21 @@ func (c EnvConfig) GetSliceInt(key string, defaultValue ...[]int) []int {
 	return result
 }
 
-// ReadEnvs obtains firstly from the file .env and then from environment variables to rewrite got from the file
-func (c EnvConfig) ReadEnvs() {
-	file, err := os.Open(".env")
+// ReadEnvs obtains firstly from the file which path can be set as a struct field 'Filepath'
+// and then from environment variables to rewrite got from the file
+func (c *EnvConfig) ReadEnvs() {
+	c.envs = map[string]string{}
+	if c.Filepath == "" {
+		c.Filepath = ".env"
+	}
+	file, err := os.Open(c.Filepath)
 	if err != nil {
-		log.Println("Failed to read file, read from all environment variables -", err)
+		if c.IsDebug {
+			log.Println(fmt.Sprintf("Skip to read file %s, read all environment variables - ", c.Filepath), err)
+		}
 		for _, env := range os.Environ() {
 			keyValuePair := strings.SplitN(env, "=", 2)
-			c[keyValuePair[0]] = keyValuePair[1]
+			c.envs[keyValuePair[0]] = keyValuePair[1]
 		}
 		return
 	}
@@ -143,16 +155,16 @@ func (c EnvConfig) ReadEnvs() {
 		text := scanner.Text()
 		if !strings.HasPrefix(text, "#") && text != "" {
 			keyValuePair := strings.SplitN(text, "=", 2)
-			c[keyValuePair[0]] = keyValuePair[1]
+			c.envs[keyValuePair[0]] = keyValuePair[1]
 		}
 	}
 	if err = scanner.Err(); err != nil {
 		log.Fatal("Failed to scan file -", err)
 	}
 
-	for key := range c {
+	for key := range c.envs {
 		if value, exist := os.LookupEnv(key); exist {
-			c[key] = value
+			c.envs[key] = value
 		}
 	}
 }

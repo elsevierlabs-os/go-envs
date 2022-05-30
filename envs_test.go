@@ -139,28 +139,39 @@ func Test_readEnvs(t *testing.T) {
 		_ = os.Remove(".env")
 	}
 
-	{ // the .env file exists and the same env var was set - envs are read
-		_ = os.Setenv("TEST_READ_ENVS_3", "read_envs_3_from_env?somePara=value")
-		_ = ioutil.WriteFile(".env", []byte("# Comment\nTEST_READ_ENVS_3=read_envs_3"), 0644)
+	{ // a file with custom name exists - envs are read
+		_ = ioutil.WriteFile(".custom_name", []byte("TEST_READ_ENVS_3=read_envs_3"), 0644)
+		envs.Filepath = ".custom_name"
 		envs.ReadEnvs()
-		if res := envs.Get("TEST_READ_ENVS_3"); res != "read_envs_3_from_env?somePara=value" {
-			t.Error(fmt.Sprintf("expected 'read_envs_3_from_env?somePara=value', got %s", res))
+		if res := envs.Get("TEST_READ_ENVS_3"); res != "read_envs_3" {
+			t.Error(fmt.Sprintf("expected 'read_envs_3', got %s", res))
+		}
+		_ = os.Remove(".custom_name")
+		envs.Filepath = ""
+	}
+
+	{ // the .env file exists and the same env var was set - envs are read
+		_ = os.Setenv("TEST_READ_ENVS_4", "read_envs_4_from_env?somePara=value")
+		_ = ioutil.WriteFile(".env", []byte("TEST_READ_ENVS_4=read_envs_4"), 0644)
+		envs.ReadEnvs()
+		if res := envs.Get("TEST_READ_ENVS_4"); res != "read_envs_4_from_env?somePara=value" {
+			t.Error(fmt.Sprintf("expected 'read_envs_4_from_env?somePara=value', got %s", res))
 		}
 		_ = os.Remove(".env")
 	}
 
 	{ // the .env file doesn't exists - envs are empty
 		envs.ReadEnvs()
-		if res := envs.Get("TEST_READ_ENVS_4"); res != "" {
+		if res := envs.Get("TEST_READ_ENVS_5"); res != "" {
 			t.Error(fmt.Sprintf("expected empty value, got %s", res))
 		}
 	}
 
 	{ // the .env file doesn't exists - envs are read
-		_ = os.Setenv("TEST_READ_ENVS_5", "read_envs_5")
+		_ = os.Setenv("TEST_READ_ENVS_6", "read_envs_6")
 		envs.ReadEnvs()
-		if res := envs.Get("TEST_READ_ENVS_5"); res != "read_envs_5" {
-			t.Error(fmt.Sprintf("expected 'read_envs_5', got %s", res))
+		if res := envs.Get("TEST_READ_ENVS_6"); res != "read_envs_6" {
+			t.Error(fmt.Sprintf("expected 'read_envs_6', got %s", res))
 		}
 	}
 }
