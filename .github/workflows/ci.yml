@@ -23,11 +23,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-versio }}
 
-      - name: Linter
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
-
       - name: Vet
         run: go vet ./...
 
