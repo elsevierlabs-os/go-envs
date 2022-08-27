@@ -1,3 +1,3 @@
 module github.com/elsevierlabs-os/go-envs
 
-go 1.18
+go 1.19
