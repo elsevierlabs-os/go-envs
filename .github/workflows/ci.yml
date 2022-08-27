@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    strategy:
+        matrix:
+          go-versio: [1.18.x, 1.19.x]
+          platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-versio }}
+
+      - name: Linter
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
