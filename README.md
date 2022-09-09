@@ -1,4 +1,6 @@
 # go-envs
+[![CI](https://github.com/elsevierlabs-os/go-envs/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/elsevierlabs-os/go-envs/actions/workflows/ci.yml)
+
 A package to parse environment variables.
 
 ### Getting started
