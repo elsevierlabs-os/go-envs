@@ -3,10 +3,6 @@ name: CI
 on:
   push:
     branches: [ "*" ]
-  pull_request:
-    branches: [ "*" ]
-    types:
-      - opened
 
 jobs:
   build:
@@ -28,7 +24,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-          install-mode: "goinstall"
+          install-mode: "binary"
 
       - name: Vet
         run: go vet ./...
